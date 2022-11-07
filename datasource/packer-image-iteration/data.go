@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/hcl2helper"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
-	packerregistry "github.com/hashicorp/packer/internal/registry"
+	packerregistry "github.com/hashicorp/packer/internal/registry/hcp/api"
 )
 
 // Type for Packer datasource has been renamed temporarily to prevent it from being

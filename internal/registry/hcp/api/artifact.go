@@ -1,4 +1,4 @@
-package registry
+package api
 
 import (
 	"fmt"
@@ -6,32 +6,32 @@ import (
 
 const BuilderId = "packer.post-processor.packer-registry"
 
-type RegistryArtifact struct {
+type registryArtifact struct {
 	BucketSlug  string
 	IterationID string
 	BuildName   string
 }
 
-func (a *RegistryArtifact) BuilderId() string {
+func (a *registryArtifact) BuilderId() string {
 	return BuilderId
 }
 
-func (*RegistryArtifact) Id() string {
+func (*registryArtifact) Id() string {
 	return ""
 }
 
-func (a *RegistryArtifact) Files() []string {
+func (a *registryArtifact) Files() []string {
 	return []string{}
 }
 
-func (a *RegistryArtifact) String() string {
+func (a *registryArtifact) String() string {
 	return fmt.Sprintf("Published metadata to HCP Packer registry packer/%s/iterations/%s", a.BucketSlug, a.IterationID)
 }
 
-func (*RegistryArtifact) State(name string) interface{} {
+func (*registryArtifact) State(name string) interface{} {
 	return nil
 }
 
-func (a *RegistryArtifact) Destroy() error {
+func (a *registryArtifact) Destroy() error {
 	return nil
 }

@@ -14,7 +14,8 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
-	"github.com/hashicorp/packer/internal/hcp"
+	"github.com/hashicorp/packer/internal/registry"
+	"github.com/hashicorp/packer/internal/registry/hcp/api"
 	"github.com/hashicorp/packer/packer"
 	"golang.org/x/sync/semaphore"
 
@@ -90,7 +91,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 		return ret
 	}
 
-	hcpHandler, diags := hcp.GetOrchestrator(packerStarter)
+	hcpHandler, diags := registry.GetRegistry(packerStarter)
 	ret = writeDiags(c.Ui, nil, diags)
 	if ret != 0 {
 		return ret
@@ -221,7 +222,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 
 			err := hcpHandler.BuildStart(buildCtx, hcpMap[name])
 			if err != nil {
-				if errors.As(err, &hcp.BuildDone{}) {
+				if errors.As(err, &api.BuildDone{}) {
 					ui.Say(fmt.Sprintf(
 						"skipping HCP-enabled build %q: already done.",
 						name))

@@ -1,4 +1,4 @@
-package registry
+package api
 
 import (
 	"fmt"
@@ -33,4 +33,14 @@ func checkErrorCode(err error, code codes.Code) bool {
 	}
 
 	return strings.Contains(err.Error(), fmt.Sprintf("Code:%d", code))
+}
+
+// BuildDone is the error returned by an HCP handler when a build cannot be started since it's already marked as DONE.
+type BuildDone struct {
+	Message string
+}
+
+// Error returns the message for the BuildDone type
+func (b BuildDone) Error() string {
+	return fmt.Sprintf("BuildDone: %s", b.Message)
 }

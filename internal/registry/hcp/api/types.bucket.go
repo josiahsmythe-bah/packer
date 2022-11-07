@@ -1,4 +1,4 @@
-package registry
+package api
 
 import (
 	"context"
@@ -13,7 +13,8 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-packer-service/stable/2021-04-30/models"
 	"github.com/hashicorp/packer-plugin-sdk/packer"
 	registryimage "github.com/hashicorp/packer-plugin-sdk/packer/registry/image"
-	"github.com/hashicorp/packer/internal/registry/env"
+	"github.com/hashicorp/packer/hcl2template"
+	"github.com/hashicorp/packer/internal/registry/hcp/env"
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc/codes"
 )
@@ -59,6 +60,27 @@ func (b *Bucket) Validate() error {
 		return fmt.Errorf("no Packer bucket name defined; either the environment variable %q is undefined or the HCL configuration has no build name", env.HCPPackerBucket)
 	}
 	return nil
+}
+
+// ReadFromHCLBuildBlock reads the information for initialising a Bucket from a HCL2 build block
+func (b *Bucket) ReadFromHCLBuildBlock(hcpBlock *hcl2template.BuildBlock) {
+	if b == nil {
+		return
+	}
+	b.Description = hcpBlock.Description
+
+	hcp := hcpBlock.HCPPackerRegistry
+	if hcp == nil {
+		return
+	}
+
+	b.BucketLabels = hcp.BucketLabels
+	b.BuildLabels = hcp.BuildLabels
+	// If there's already a Slug this was set from env variable.
+	// In Packer, env variable overrides config values so we keep it that way for consistency.
+	if b.Slug == "" && hcp.Slug != "" {
+		b.Slug = hcp.Slug
+	}
 }
 
 // connect initializes a client connection to a remote HCP Packer Registry service on HCP.
@@ -475,7 +497,9 @@ func (b *Bucket) HeartbeatBuild(ctx context.Context, build string) (func(), erro
 
 func (b *Bucket) BuildStart(ctx context.Context, buildName string) error {
 	if !b.IsExpectingBuildForComponent(buildName) {
-		return fmt.Errorf("already done")
+		return &BuildDone{
+			Message: "build is already done",
+		}
 	}
 
 	err := b.UpdateBuildStatus(ctx, buildName, models.HashicorpCloudPackerBuildStatusRUNNING)
@@ -576,7 +600,7 @@ func (b *Bucket) BuildDone(
 			parErr)
 	}
 
-	return append(artifacts, &RegistryArtifact{
+	return append(artifacts, &registryArtifact{
 		BuildName:   buildName,
 		BucketSlug:  b.Slug,
 		IterationID: b.Iteration.ID,
