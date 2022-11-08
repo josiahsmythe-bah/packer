@@ -9,19 +9,20 @@ import (
 // nullRegistry is a special handler that does nothing
 type nullRegistry struct{}
 
-func newNullHandler() Registry {
-	return nullRegistry{}
-}
+// We don't need a constructor for such a simple type
+//func newNullHandler() Registry {
+//return nullRegistry{}
+//}
 
-func (h nullRegistry) PopulateIteration(context.Context) error {
+func (r nullRegistry) PopulateIteration(context.Context) error {
 	return nil
 }
 
-func (h nullRegistry) BuildStart(context.Context, string) error {
+func (r nullRegistry) BuildStart(context.Context, string) error {
 	return nil
 }
 
-func (h nullRegistry) BuildDone(
+func (r nullRegistry) BuildDone(
 	ctx context.Context,
 	buildName string,
 	artifacts []sdkpacker.Artifact,

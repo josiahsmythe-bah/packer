@@ -10,13 +10,13 @@ import (
 	"github.com/hashicorp/packer/packer"
 )
 
-// jsonRegistry is a HCP handler made to process legacy JSON templates
-type jsonRegistry struct {
+// JSONMetadataRegistry is a HCP handler made to process legacy JSON templates
+type JSONMetadataRegistry struct {
 	configuration *packer.Core
 	bucket        *api.Bucket
 }
 
-func NewJSONRegistry(config *packer.Core) (*jsonRegistry, hcl.Diagnostics) {
+func NewJSONMetadataRegistry(config *packer.Core) (*JSONMetadataRegistry, hcl.Diagnostics) {
 	bucket, diags := createConfiguredBucket(
 		filepath.Dir(config.Template.Path),
 		withPackerEnvConfiguration,
@@ -31,14 +31,14 @@ func NewJSONRegistry(config *packer.Core) (*jsonRegistry, hcl.Diagnostics) {
 		bucket.RegisterBuildForComponent(packer.HCPName(b))
 	}
 
-	return &jsonRegistry{
+	return &JSONMetadataRegistry{
 		configuration: config,
 		bucket:        bucket,
 	}, nil
 }
 
 // PopulateIteration creates the metadata on HCP for a build
-func (h *jsonRegistry) PopulateIteration(ctx context.Context) error {
+func (h *JSONMetadataRegistry) PopulateIteration(ctx context.Context) error {
 	for _, b := range h.configuration.Template.Builders {
 		// Get all builds slated within config ignoring any only or exclude flags.
 		h.bucket.RegisterBuildForComponent(b.Name)
@@ -62,12 +62,12 @@ func (h *jsonRegistry) PopulateIteration(ctx context.Context) error {
 }
 
 // BuildStart is invoked when one build for the configuration is starting to be processed
-func (h *jsonRegistry) BuildStart(ctx context.Context, buildName string) error {
+func (h *JSONMetadataRegistry) BuildStart(ctx context.Context, buildName string) error {
 	return h.bucket.BuildStart(ctx, buildName)
 }
 
 // BuildDone is invoked when one build for the configuration has finished
-func (h *jsonRegistry) BuildDone(
+func (h *JSONMetadataRegistry) BuildDone(
 	ctx context.Context,
 	buildName string,
 	artifacts []sdkpacker.Artifact,

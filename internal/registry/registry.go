@@ -12,24 +12,25 @@ import (
 
 // Registry is an entity capable to orchestrate a Packer build and upload metadata to HCP
 type Registry interface {
+	//Configure(packer.Handler)
 	PopulateIteration(context.Context) error
 	BuildStart(context.Context, string) error
 	BuildDone(ctx context.Context, buildName string, artifacts []sdkpacker.Artifact, buildErr error) ([]sdkpacker.Artifact, error)
 }
 
-// GetRegistry instanciates the appropriate handler for the configuration type given as parameter.
-//
-// If no HCP-related data is present, it will be a NoopHandler.
+// GetRegistry instanciates the appropriate registry for the Packer configuration template type.
+// A nullRegistry is returned for non-HCP Packer registry enabled templates.
 func GetRegistry(cfg packer.Handler) (Registry, hcl.Diagnostics) {
 	if !hcp.IsHCPEnabled(cfg) {
-		return newNullHandler(), nil
+		return &nullRegistry{}, nil
 	}
 
 	switch config := cfg.(type) {
 	case *hcl2template.PackerConfig:
-		return hcp.NewHCLRegistry(config)
+		// Maybe rename to what it represents....
+		return hcp.NewHCLMetadataRegistry(config)
 	case *packer.Core:
-		return hcp.NewJSONRegistry(config)
+		return hcp.NewJSONMetadataRegistry(config)
 	}
 
 	return nil, hcl.Diagnostics{
@@ -38,7 +39,7 @@ func GetRegistry(cfg packer.Handler) (Registry, hcl.Diagnostics) {
 			Summary:  "Unknown Config type",
 			Detail: "The config type %s does not match a Packer-known template type. " +
 				"This is a Packer error and should be brought up to the Packer " +
-				"team via a Github Issue.",
+				"team via a GitHub Issue.",
 		},
 	}
 }

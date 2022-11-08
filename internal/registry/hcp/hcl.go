@@ -14,8 +14,8 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 )
 
-// hclRegistry is a HCP handler made for handling HCL configurations
-type hclRegistry struct {
+// HCLMetadataRegistry is a HCP handler made for handling HCL configurations
+type HCLMetadataRegistry struct {
 	configuration *hcl2template.PackerConfig
 	bucket        *api.Bucket
 }
@@ -28,7 +28,7 @@ const (
 )
 
 // PopulateIteration creates the metadata on HCP for a build
-func (h *hclRegistry) PopulateIteration(ctx context.Context) error {
+func (h *HCLMetadataRegistry) PopulateIteration(ctx context.Context) error {
 	err := h.bucket.Initialize(ctx)
 	if err != nil {
 		return err
@@ -47,12 +47,12 @@ func (h *hclRegistry) PopulateIteration(ctx context.Context) error {
 }
 
 // BuildStart is invoked when one build for the configuration is starting to be processed
-func (h *hclRegistry) BuildStart(ctx context.Context, buildName string) error {
+func (h *HCLMetadataRegistry) BuildStart(ctx context.Context, buildName string) error {
 	return h.bucket.BuildStart(ctx, buildName)
 }
 
 // BuildDone is invoked when one build for the configuration has finished
-func (h *hclRegistry) BuildDone(
+func (h *HCLMetadataRegistry) BuildDone(
 	ctx context.Context,
 	buildName string,
 	artifacts []sdkpacker.Artifact,
@@ -61,7 +61,7 @@ func (h *hclRegistry) BuildDone(
 	return h.bucket.BuildDone(ctx, buildName, artifacts, buildErr)
 }
 
-func NewHCLRegistry(config *hcl2template.PackerConfig) (*hclRegistry, hcl.Diagnostics) {
+func NewHCLMetadataRegistry(config *hcl2template.PackerConfig) (*HCLMetadataRegistry, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 	if len(config.Builds) > 1 {
 		diags = append(diags, &hcl.Diagnostic{
@@ -118,7 +118,7 @@ func NewHCLRegistry(config *hcl2template.PackerConfig) (*hclRegistry, hcl.Diagno
 		bucket.RegisterBuildForComponent(source.String())
 	}
 
-	return &hclRegistry{
+	return &HCLMetadataRegistry{
 		configuration: config,
 		bucket:        bucket,
 	}, nil
