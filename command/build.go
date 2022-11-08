@@ -3,7 +3,6 @@ package command
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -15,7 +14,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer/internal/registry"
-	"github.com/hashicorp/packer/internal/registry/hcp/api"
 	"github.com/hashicorp/packer/packer"
 	"golang.org/x/sync/semaphore"
 
@@ -221,13 +219,18 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 			defer limitParallel.Release(1)
 
 			err := hcpHandler.BuildStart(buildCtx, hcpMap[name])
+			// Seems odd to require this error check here. Now that it is an error we can just exit with diag
 			if err != nil {
-				if errors.As(err, &api.BuildDone{}) {
-					ui.Say(fmt.Sprintf(
-						"skipping HCP-enabled build %q: already done.",
-						name))
-					return
-				}
+				writeDiags(c.Ui, nil, hcl.Diagnostics{
+					&hcl.Diagnostic{
+						Summary: fmt.Sprintf(
+							"Registry build %q skipped for the following reasons:",
+							name),
+						Severity: hcl.DiagWarning,
+						Detail:   err.Error(),
+					},
+				})
+				return
 			}
 
 			log.Printf("Starting build run: %s", name)

@@ -36,6 +36,7 @@ func checkErrorCode(err error, code codes.Code) bool {
 }
 
 // BuildDone is the error returned by an HCP handler when a build cannot be started since it's already marked as DONE.
+// Do we need this error type???
 type BuildDone struct {
 	Message string
 }
