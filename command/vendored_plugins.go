@@ -77,6 +77,8 @@ import (
 	yandexbuilder "github.com/hashicorp/packer-plugin-yandex/builder/yandex"
 	yandexexportpostprocessor "github.com/hashicorp/packer-plugin-yandex/post-processor/yandex-export"
 	yandeximportpostprocessor "github.com/hashicorp/packer-plugin-yandex/post-processor/yandex-import"
+	hcppackerimagedatasource "github.com/hashicorp/packer/internal/hcp/datasource/hcp-packer-image"
+	hcppackeriterationdatasource "github.com/hashicorp/packer/internal/hcp/datasource/hcp-packer-iteration"
 )
 
 // VendoredDatasources are datasource components that were once bundled with the
@@ -84,6 +86,8 @@ import (
 var VendoredDatasources = map[string]packersdk.Datasource{
 	"amazon-ami":            new(amazonamidatasource.Datasource),
 	"amazon-secretsmanager": new(amazonsecretsmanagerdatasource.Datasource),
+	"hcp-packer-image":      new(hcppackerimagedatasource.Datasource),
+	"hcp-packer-iteration":  new(hcppackeriterationdatasource.Datasource),
 }
 
 // VendoredBuilders are builder components that were once bundled with the

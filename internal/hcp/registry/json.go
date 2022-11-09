@@ -1,4 +1,4 @@
-package hcp
+package registry
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	sdkpacker "github.com/hashicorp/packer-plugin-sdk/packer"
-	"github.com/hashicorp/packer/internal/registry/hcp/api"
+	"github.com/hashicorp/packer/internal/hcp/api"
 	"github.com/hashicorp/packer/packer"
 )
 

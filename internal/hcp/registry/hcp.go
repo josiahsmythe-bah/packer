@@ -1,12 +1,12 @@
-package hcp
+package registry
 
 import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/packer/hcl2template"
-	"github.com/hashicorp/packer/internal/registry/hcp/api"
-	"github.com/hashicorp/packer/internal/registry/hcp/env"
+	"github.com/hashicorp/packer/internal/hcp/api"
+	"github.com/hashicorp/packer/internal/hcp/env"
 	"github.com/hashicorp/packer/packer"
 )
 

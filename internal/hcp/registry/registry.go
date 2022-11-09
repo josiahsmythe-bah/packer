@@ -1,3 +1,4 @@
+// Package registry provides access to the HCP registry.
 package registry
 
 import (
@@ -6,7 +7,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	sdkpacker "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer/hcl2template"
-	"github.com/hashicorp/packer/internal/registry/hcp"
 	"github.com/hashicorp/packer/packer"
 )
 
@@ -18,19 +18,19 @@ type Registry interface {
 	BuildDone(ctx context.Context, buildName string, artifacts []sdkpacker.Artifact, buildErr error) ([]sdkpacker.Artifact, error)
 }
 
-// GetRegistry instanciates the appropriate registry for the Packer configuration template type.
+// New instanciates the appropriate registry for the Packer configuration template type.
 // A nullRegistry is returned for non-HCP Packer registry enabled templates.
-func GetRegistry(cfg packer.Handler) (Registry, hcl.Diagnostics) {
-	if !hcp.IsHCPEnabled(cfg) {
+func New(cfg packer.Handler) (Registry, hcl.Diagnostics) {
+	if !IsHCPEnabled(cfg) {
 		return &nullRegistry{}, nil
 	}
 
 	switch config := cfg.(type) {
 	case *hcl2template.PackerConfig:
 		// Maybe rename to what it represents....
-		return hcp.NewHCLMetadataRegistry(config)
+		return NewHCLMetadataRegistry(config)
 	case *packer.Core:
-		return hcp.NewJSONMetadataRegistry(config)
+		return NewJSONMetadataRegistry(config)
 	}
 
 	return nil, hcl.Diagnostics{

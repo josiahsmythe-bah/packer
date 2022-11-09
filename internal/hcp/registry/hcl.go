@@ -1,4 +1,4 @@
-package hcp
+package registry
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	sdkpacker "github.com/hashicorp/packer-plugin-sdk/packer"
-	imgds "github.com/hashicorp/packer/datasource/hcp-packer-image"
-	iterds "github.com/hashicorp/packer/datasource/hcp-packer-iteration"
 	"github.com/hashicorp/packer/hcl2template"
-	"github.com/hashicorp/packer/internal/registry/hcp/api"
+	"github.com/hashicorp/packer/internal/hcp/api"
+	hcppackerimagedatasource "github.com/hashicorp/packer/internal/hcp/datasource/hcp-packer-image"
+	hcppackeriterationdatasource "github.com/hashicorp/packer/internal/hcp/datasource/hcp-packer-iteration"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -124,8 +124,8 @@ func NewHCLMetadataRegistry(config *hcl2template.PackerConfig) (*HCLMetadataRegi
 	}, nil
 }
 
-func imageValueToDSOutput(imageVal map[string]cty.Value) imgds.DatasourceOutput {
-	dso := imgds.DatasourceOutput{}
+func imageValueToDSOutput(imageVal map[string]cty.Value) hcppackerimagedatasource.DatasourceOutput {
+	dso := hcppackerimagedatasource.DatasourceOutput{}
 	for k, v := range imageVal {
 		switch k {
 		case "id":
@@ -159,8 +159,8 @@ func imageValueToDSOutput(imageVal map[string]cty.Value) imgds.DatasourceOutput 
 	return dso
 }
 
-func iterValueToDSOutput(iterVal map[string]cty.Value) iterds.DatasourceOutput {
-	dso := iterds.DatasourceOutput{}
+func iterValueToDSOutput(iterVal map[string]cty.Value) hcppackeriterationdatasource.DatasourceOutput {
+	dso := hcppackeriterationdatasource.DatasourceOutput{}
 	for k, v := range iterVal {
 		switch k {
 		case "author_id":
@@ -200,7 +200,7 @@ func withDatasourceConfiguration(vals map[string]cty.Value) bucketConfigurationO
 			return nil
 		}
 
-		iterations := map[string]iterds.DatasourceOutput{}
+		iterations := map[string]hcppackeriterationdatasource.DatasourceOutput{}
 
 		var err error
 		if iterOK {
@@ -222,7 +222,7 @@ func withDatasourceConfiguration(vals map[string]cty.Value) bucketConfigurationO
 			}
 		}
 
-		images := map[string]imgds.DatasourceOutput{}
+		images := map[string]hcppackerimagedatasource.DatasourceOutput{}
 
 		if imageOK {
 			hcpData := map[string]cty.Value{}

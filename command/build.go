@@ -13,7 +13,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
-	"github.com/hashicorp/packer/internal/registry"
+	"github.com/hashicorp/packer/internal/hcp/registry"
 	"github.com/hashicorp/packer/packer"
 	"golang.org/x/sync/semaphore"
 
@@ -89,13 +89,13 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 		return ret
 	}
 
-	hcpHandler, diags := registry.GetRegistry(packerStarter)
+	hcpRegistry, diags := registry.New(packerStarter)
 	ret = writeDiags(c.Ui, nil, diags)
 	if ret != 0 {
 		return ret
 	}
 
-	err := hcpHandler.PopulateIteration(buildCtx)
+	err := hcpRegistry.PopulateIteration(buildCtx)
 	if err != nil {
 		return writeDiags(c.Ui, nil, hcl.Diagnostics{
 			&hcl.Diagnostic{
@@ -218,7 +218,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 
 			defer limitParallel.Release(1)
 
-			err := hcpHandler.BuildStart(buildCtx, hcpMap[name])
+			err := hcpRegistry.BuildStart(buildCtx, hcpMap[name])
 			// Seems odd to require this error check here. Now that it is an error we can just exit with diag
 			if err != nil {
 				writeDiags(c.Ui, nil, hcl.Diagnostics{
@@ -241,7 +241,7 @@ func (c *BuildCommand) RunContext(buildCtx context.Context, cla *BuildArgs) int 
 			buildDuration := buildEnd.Sub(buildStart)
 			fmtBuildDuration := durafmt.Parse(buildDuration).LimitFirstN(2)
 
-			runArtifacts, hcperr := hcpHandler.BuildDone(
+			runArtifacts, hcperr := hcpRegistry.BuildDone(
 				buildCtx,
 				hcpMap[name],
 				runArtifacts,

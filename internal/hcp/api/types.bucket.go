@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/packer"
 	registryimage "github.com/hashicorp/packer-plugin-sdk/packer/registry/image"
 	"github.com/hashicorp/packer/hcl2template"
-	"github.com/hashicorp/packer/internal/registry/hcp/env"
+	"github.com/hashicorp/packer/internal/hcp/env"
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc/codes"
 )
