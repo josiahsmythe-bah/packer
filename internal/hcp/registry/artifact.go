@@ -1,10 +1,10 @@
-package api
+package registry
 
 import (
 	"fmt"
 )
 
-const BuilderId = "packer.post-processor.packer-registry"
+const BuilderId = "packer.post-processor.hpc-packer-registry"
 
 type registryArtifact struct {
 	BucketSlug  string
